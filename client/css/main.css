@@ -1,0 +1,360 @@
+* {
+    outline: none;
+    border: none;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    user-select: none;
+}
+
+html, body, .wrapper {
+    height: 100%;
+    background-color: #eee;
+    font-family: 'Fira Sans', 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+#map {
+    height: 100vh;
+    width: 100vw;
+    background-color: #eee;
+    position: relative;
+}
+
+/*add block*/
+.addReview {
+    /*display: none;*/
+
+    width: 760px;
+    background-color: #ffffff;
+    border-radius: 15px;
+    padding-bottom: 15px;
+
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translateY(-50%) translateX(-50%);
+
+    z-index: 11;
+}
+
+.addReview__title {
+    font-size: 20px;
+    text-transform: uppercase;
+    margin-top: 0;
+    margin-bottom: 15px;
+    padding-left: 15px;
+    border-left: 5px solid #26a69a;
+}
+
+.header {
+    background-color: #26a69a;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 15px;
+}
+
+.address {
+    padding-left: 15px;
+    position: relative;
+    width: 320px;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.address:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background-image: url('../img/map-icon.png');
+    background-repeat: no-repeat;
+    width: 8px;
+    height: 14px;
+}
+
+.close {
+    width: 14px;
+    height: 14px;
+}
+
+/* отзывы */
+.reviews {
+    padding: 15px;
+    border-bottom: 1px solid #c4c4c4;
+}
+
+.reviews-list {
+    list-style-type: none;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0;
+    height: 165px;
+    overflow-y: auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.review-item {
+    width: 100%;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.review-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 20px;
+}
+
+.review-image img {
+    width: 100%;
+    height: auto;
+}
+
+.review-content {
+    width: calc(100% - 120px);
+}
+
+.review-top {
+    margin-bottom: 5px;
+}
+
+.review-name {
+    font-weight: bold;
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 18px;
+}
+
+.review-info {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.review-place {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.review-date {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.review-text {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+/* фотографии */
+.photos {
+    padding: 15px;
+    border-bottom: 1px solid #c4c4c4;
+}
+.photos__list {
+    list-style-type: none;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0;
+    font-size: 0;
+    /*height: 150px;*/
+    overflow-y: auto;
+}
+
+.photos__item {
+    width: 145px;
+    height: 145px;
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 14px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+.photos__item:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    background-color: #000;
+    opacity: 0;
+    background-image: url('../img/loupe.png');
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.photos__item:hover:before {
+    opacity: .5;
+}
+.photos__item:hover .photos__img {
+    transform: scale(1.5);
+}
+
+.photos__img {
+    width: 100%;
+    height: auto;
+    display: block;
+    position: relative;
+    z-index: 1;
+    transition: transform 1.0s ease-in-out;
+}
+
+.photo-upload {
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.photo-upload__input {
+    margin-right: 10px;
+    background-color: #eee;
+    box-sizing: border-box;
+    padding: 6px 10px;
+}
+
+.photo-upload__submit {
+    background-color: #ff8663;
+    color: #ffffff;
+    width: 100px;
+    height: 30px;
+    border-radius: 15px;
+}
+
+/* timer */
+.timer-wrap {
+    padding: 15px;
+    display: none;
+}
+
+/* фотма добавления */
+.review-form {
+    margin-bottom: 15px;
+    padding: 15px;
+}
+
+.review-form-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.form-name {
+    display: block;
+    width: 49%;
+    height: 34px;
+    border-radius: 17px;
+    border: 1px solid #c4c4c4;
+    padding-left: 15px;
+    margin-bottom: 15px;
+    font-size: 15px;
+    color: #9f9f9f;
+}
+
+.form-place-name {
+    display: block;
+    width: 49%;
+    height: 34px;
+    border-radius: 17px;
+    border: 1px solid #c4c4c4;
+    padding-left: 15px;
+    margin-bottom: 15px;
+    font-size: 15px;
+    color: #9f9f9f;
+}
+
+.form-text {
+    display: block;
+    width: 100%;
+    height: 100px;
+    min-height: 50px;
+    max-height: 200px;
+    border-radius: 17px;
+    border: 1px solid #c4c4c4;
+    padding-left: 15px;
+    padding-top: 10px;
+    font-size: 15px;
+    color: #9f9f9f;
+    resize: vertical;
+}
+
+.add-btn-group {
+    text-align: right;
+    padding: 0 15px;
+}
+
+/*add block end*/
+
+.logo {
+    position: absolute;
+    right: 23px;
+    bottom: 38px;
+    z-index: 10;
+    background-image: url('../img/logo.png');
+    width: 107px;
+    height: 79px;
+}
+
+.balloonLink {
+    color: #000000;
+}
+
+.balloonLink:hover {
+    text-decoration: none;
+}
+
+.clusterTitle {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.clusterText {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+/*custom scroll*/
+::-webkit-scrollbar-button {
+    width: 5px;
+    height: 0;
+}
+
+::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    height: 80px;
+    background-color: #c4c4c4;
+}
+
+::-webkit-resizer {
+    width: 4px;
+    height: 0;
+}
+
+::-webkit-scrollbar {
+    width: 4px;
+}
