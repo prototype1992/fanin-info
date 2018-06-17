@@ -1,4 +1,29 @@
-function createPhotoItem(url) {
+const API_URL = 'http://localhost:9001/api/places';
+
+class PlaceApi {
+    static getPlaces() {
+        return fetch(API_URL, {method: 'get'})
+            .then(response => response.json())
+    }
+
+    static addPlace(place) {
+        return fetch(API_URL, {
+            method: 'post',
+            body: JSON.stringify(place),
+            headers: {
+                'Accept': 'application/json',
+                'Content-type': 'application/json'
+            }
+        })
+            .then(response => response.json());
+    }
+}
+
+class MapApi {
+    static createPlaceMark(coords) {}
+}
+
+function photoComponent(url) {
     // create li
     let photoItem = document.createElement('li');
     photoItem.classList.add('photos__item');
@@ -12,7 +37,7 @@ function createPhotoItem(url) {
     return photoItem;
 }
 
-function createReviewNode(item) {
+function reviewComponent(item) {
     console.log('item', item);
 
     // создаем обертку
@@ -25,7 +50,7 @@ function createReviewNode(item) {
 
     // картинка человека
     let userImage = new Image();
-    userImage.src = './src/img/fanin.jpg';
+    userImage.src = './img/fanin.jpg';
 
     // вставляем аватарку в блок
     reviewImage.appendChild(userImage);
@@ -47,7 +72,7 @@ function createReviewNode(item) {
 
     let reviewPlace = document.createElement('span');
     reviewPlace.classList.add('review-place');
-    reviewPlace.textContent = item.placeValue;
+    reviewPlace.textContent = item.place;
 
     let reviewDate = document.createElement('span');
     reviewDate.classList.add('review-date');
@@ -73,6 +98,7 @@ function createReviewNode(item) {
 }
 
 let myMap = null; // карта
+let places = []; // карта
 let clusterer = null; // кластер для меток
 let placeMark = null; // текущая открытая метка
 let coords = null; // временное хранение координат
@@ -86,7 +112,6 @@ const DOM = {
     address: document.querySelector('#address'),
     close: document.querySelector('#close'),
     addBtn: document.querySelector('#add-btn'),
-    formName: document.querySelector('#form-name'),
     formPlaceName: document.querySelector('#form-place-name'),
     formText: document.querySelector('#form-text'),
     list: document.querySelector('#reviews-list'),
@@ -101,24 +126,14 @@ ymaps.ready(initMap);
 function initMap() {
     myMap = new ymaps.Map("map", {
         center: [55.76, 37.64],
-        zoom: 5,
-        // controls: ['zoomControl'],
+        zoom: 4,
+        controls: ['zoomControl'],
         // behaviors: ['drag']
     });
 
     // создаем кластер
     clusterer = new ymaps.Clusterer({
-        preset: 'islands#invertedVioletClusterIcons',
-        groupByCoordinates: false,
-        clusterDisableClickZoom: true,
-        clusterHideIconOnBalloonOpen: false,
-        geoObjectHideIconOnBalloonOpen: false,
-        clusterOpenBalloonOnClick: true,
-        clusterBalloonContentLayout: 'cluster#balloonCarousel',
-        clusterBalloonPanelMaxMapArea: 0,
-        clusterBalloonContentLayoutWidth: 250,
-        clusterBalloonContentLayoutHeight: 150,
-        clusterBalloonPagerSize: 5
+        preset: 'islands#invertedVioletClusterIcons'
     });
     clusterer.add(points);
     myMap.geoObjects.add(clusterer);
@@ -127,6 +142,8 @@ function initMap() {
     myMap.events.add('click', function (e) {
         // получаем координаты
         coords = e.get('coords');
+
+        console.log('coords', coords.toString());
 
         // отображаем блок с добавлением
         showAddReview();
@@ -158,27 +175,86 @@ function initMap() {
         // меняем адрес в строке адреса
         changeAddress(coords, DOM.address);
     });
+
+    console.log('points', points);
+
+    // получаем все метки с api и рендерим их на карту
+    PlaceApi.getPlaces()
+        .then(response => {
+            console.log('getPlaces', response);
+            places = response;
+            console.log('places', places);
+            response.forEach(item => {
+                let myPlaceMark = new ymaps.Placemark(
+                    item.coordinates.split(','),
+                    {
+                        preset: 'islands#violetDotIconWithCaption',
+                        draggable: false,
+                        openBalloonOnClick: false
+                    }
+                );
+                // вставляем данные с апи в метку
+                myPlaceMark.properties.set('_id', item._id);
+                myPlaceMark.properties.set('reviews', item.reviews);
+                myPlaceMark.properties.set('photos', item.photos);
+
+                // добавляем метку на карту
+                myMap.geoObjects.add(myPlaceMark);
+                console.log('myPlaceMark', myPlaceMark);
+
+                // обработка клика по карте
+                myPlaceMark.events.add('click', event => {
+                    let _id = myPlaceMark.properties.get('_id');
+
+                    console.log('_id', _id);
+                    console.log('coords', coords);
+                    coords = myPlaceMark.geometry.getCoordinates();
+
+                    placeMark = myPlaceMark;
+
+                    // показываем блок
+                    showAddReview();
+
+                    // меняем адрес
+                    changeAddress(myPlaceMark.geometry.getCoordinates(), DOM.address);
+
+                    // рендерим отзывы
+                    reviews = myPlaceMark.properties.get('reviews');
+                    renderReviews(reviews);
+
+                    // рендерим фотки
+                    photos = myPlaceMark.properties.get('photos');
+                    renderPhotos(photos);
+                });
+            })
+        });
 }
 
 // событие добавления отзыва
-DOM.addBtn.addEventListener('click', event => {
-    let {formName, formPlaceName, formText} = DOM;
+DOM.addBtn.addEventListener('click', () => {
+    let {formPlaceName, formText} = DOM;
 
     let date = new Date();
 
     let newReview = {
-        name: formName.value,
-        placeValue: formPlaceName.value,
+        place: formPlaceName.value,
         comment: formText.value,
-        date: date.toLocaleString()
+        date: date.toLocaleString(),
+        coordinates: coords.toString(),
+        address: DOM.address.textContent,
+        reviewPlace: formPlaceName.value,
+        reviewComment: formText.value,
+        photoUrl: 'http://www.nat-geo.ru/upload/iblock/484/484764813d6e0fabdfe15024d814ea34.jpg'
     };
 
     // если форма валидка
     if (validForm()) {
         // Если метка уже создана.
         if (!placeMark) {
+            // отправляем запрос в БД
+            PlaceApi.addPlace(newReview);
             // create placeMark to map
-            createPlaceMark(coords, newReview);
+            createPlaceMark(coords);
             // add review
             addReview(newReview);
             // render reviews
@@ -222,45 +298,11 @@ function showAddReview() {
     DOM.addReview.style.display = 'block';
 }
 
-function openClusterLink(event) {
-    showAddReview();
-
-    let balloonLink = document.querySelector('.balloonLink');
-
-    let localCoords = balloonLink.getAttribute('data-coords');
-    let localReviews = [];
-
-    // console.log('balloonLink', balloonLink);
-    // console.log('localCoords', localCoords);
-    // console.log('points', points);
-
-    for (let item of points) {
-        if (item.geometry._coordinates.toString() === localCoords.toString()) {
-            localReviews.push(item.properties.get('reviews'));
-            console.log('localReviews', localReviews);
-        }
-    }
-    renderReviews(localReviews[0]);
-}
-
-window.openClusterLink = openClusterLink;
-
 // создание метки
-function createPlaceMark(coords, review) {
+function createPlaceMark(coords) {
     //Создаём метку.
     let newPlaceMark = new ymaps.Placemark(
         coords,
-        {
-            balloonContentHeader: `<p>${review.placeValue}</p>`,
-            balloonContentBody: `<div>
-<h3 class="clusterTitle"><a href="#" data-coords="${coords}" class="balloonLink" onclick="(function() {
-    console.log('this', this);
-    window.openClusterLink();
-})()">${DOM.address.textContent}</a></h3>
-<p class="clusterText">${review.placeValue}</p>
-</div>`,
-            balloonContentFooter: `<p>${review.date}</p>`
-        },
         {
             preset: 'islands#violetDotIconWithCaption',
             draggable: false,
@@ -295,16 +337,20 @@ function createPlaceMark(coords, review) {
         reviews = newPlaceMark.properties.get('reviews');
         renderReviews(reviews);
     });
+
+    console.log('placeMark', placeMark);
 }
 
 // рендер отзывов
 function renderReviews(data) {
     DOM.list.innerHTML = '';
 
+    console.log('data renderReviews', data);
+
     let fragment = document.createDocumentFragment();
 
     for (let item of data) {
-        let review = createReviewNode(item);
+        let review = reviewComponent(item);
 
         fragment.appendChild(review);
     }
@@ -312,10 +358,26 @@ function renderReviews(data) {
     DOM.list.appendChild(fragment);
 }
 
+function renderPhotos(data) {
+    DOM.photosList.innerHTML = '';
+
+    console.log('data renderPhotos', data);
+
+    let fragment = document.createDocumentFragment();
+
+    for (let item of data) {
+        let photo = photoComponent(item.url);
+
+        fragment.appendChild(photo);
+    }
+
+    DOM.photosList.appendChild(fragment);
+}
+
 // добавление отзыва
 function addReview(object) {
-    let {name, placeValue, comment} = object;
-    if (name && placeValue && comment) {
+    let {reviewPlace, reviewComment} = object;
+    if (reviewPlace && reviewComment) {
         reviews.push(object);
     } else {
         alert('Заполните все поля для добавления отзыва!');
@@ -334,14 +396,13 @@ function changeAddress(coords, element) {
 }
 
 function validForm() {
-    if (DOM.formName.value && DOM.formPlaceName.value && DOM.formText) {
+    if (DOM.formPlaceName.value && DOM.formText) {
         return true;
     }
     return false;
 }
 
 function clearForm() {
-    DOM.formName.value = '';
     DOM.formPlaceName.value = '';
     DOM.formText.value = '';
 }
@@ -363,7 +424,6 @@ DOM.formUpload.addEventListener('submit', event => {
     xhr.addEventListener('load', response => {
         let responseParse = JSON.parse(response.target.response);
 
-        DOM.photosList.appendChild(createPhotoItem(responseParse.url));
+        DOM.photosList.appendChild(photoComponent(responseParse.url));
     });
 });
-

@@ -19,6 +19,10 @@ app.use(bodyParser.urlencoded({
 // static files
 app.use(express.static(path.join(__dirname, 'client')));
 
+// routes
+const placeRouter = require('./routes/places');
+app.use('/api/places', placeRouter);
+
 // connect db
 mongoose.connect(config.MONGO_SERVER)
     .then(() => {

@@ -12,6 +12,22 @@
 
 <div class="wrapper">
 
+    <!-- Modal Trigger -->
+    <button class="waves-effect waves-light btn-large auth-btn" data-target="auth-modal">
+        <i class="material-icons">account_box</i>
+    </button>
+
+    <!-- Modal Structure -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content">
+            <h4>Modal Header</h4>
+            <p>A bunch of text</p>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Agree</a>
+        </div>
+    </div>
+
     <div id="map">
         <div class="addReview" id="addReview">
             <header class="header">
@@ -23,62 +39,10 @@
             <div id="reviews" class="reviews">
                 <h3 class="addReview__title">Мой отзыв</h3>
                 <ul class="reviews-list" id="reviews-list">
-                    <li class="review-item">
-                        <div class="review-image">
-                            <img src="./media/fanin.jpg" alt="fanin">
-                        </div>
-                        <div class="review-content">
-                            <div class="review-top">
-                                <h4 class="review-name">Валентин Фанин</h4>
-                                <div class="review-info">
-                                    <span class="review-place">Шоколадница</span>
-                                    <span class="review-date">13.12.2015</span>
-                                </div>
-                            </div>
-                            <p class="review-text">
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus doloremque doloribus
-                                excepturi exercitationem expedita explicabo facere hic illo illum magni, maiores
-                                molestiae nostrum, nulla pariatur perspiciatis quidem quos recusandae reiciendis
-                                repellendus, repudiandae rerum similique soluta vel. Asperiores debitis ea eius eligendi
-                                enim eos, molestiae non obcaecati, officiis perspiciatis quasi quod?
-                            </p>
-                        </div>
-                    </li>
-                    <li class="review-item">
-                        <div class="review-image">
-                            <img src="https://pp.userapi.com/c627127/v627127752/15d54/xpEMbTga8sA.jpg" alt="fanin">
-                        </div>
-                        <div class="review-content">
-                            <div class="review-top">
-                                <h4 class="review-name">Шамиль Алисултанов</h4>
-                                <div class="review-info">
-                                    <span class="review-place">Метро</span>
-                                    <span class="review-date">12.06.2018, 20:51:07</span>
-                                </div>
-                            </div>
-                            <p class="review-text">Очень хорошее место!</p>
-                        </div>
-                    </li>
-                    <li class="review-item">
-                        <div class="review-image">
-                            <img src="https://pp.userapi.com/c847216/v847216417/300cd/k3d3YEBnLDs.jpg?ava=1"
-                                 alt="fanin">
-                        </div>
-                        <div class="review-content">
-                            <div class="review-top">
-                                <h4 class="review-name">Артем Горбачев</h4>
-                                <div class="review-info">
-                                    <span class="review-place">Метро</span>
-                                    <span class="review-date">12.06.2018, 20:51:07</span>
-                                </div>
-                            </div>
-                            <p class="review-text">Очень хорошее место!</p>
-                        </div>
-                    </li>
                 </ul>
             </div>
             <div class="photos" id="photos">
-                <h3 class="addReview__title">Фотография места</h3>
+                <h3 class="addReview__title">Фотографии места</h3>
                 <ul class="photos__list" id="photos-list">
                 </ul>
                 <form class="photo-upload" id="formUpload">
@@ -101,11 +65,11 @@
             <form class="review-form">
                 <h3 class="addReview__title">ВАШ ОТЗЫВ</h3>
                 <div class="review-form-top">
-                    <input type="text" id="form-name" class="form-name" placeholder="Ваше имя" value="Шамиль">
                     <input type="text" id="form-place-name" class="form-place-name" placeholder="Укажите место"
                            value="Супер крутое место">
                 </div>
-                <textarea id="form-text" class="form-text" placeholder="Поделитесь впечатлениями">Мой комментарий</textarea>
+                <textarea id="form-text" class="form-text"
+                          placeholder="Поделитесь впечатлениями">Мой комментарий</textarea>
             </form>
             <div class="add-btn-group">
                 <button class="waves-effect waves-light btn" id="add-btn">
@@ -113,7 +77,6 @@
                 </button>
             </div>
         </div>
-        <div class="logo"></div>
     </div>
 
 </div>
@@ -123,5 +86,10 @@
 <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
 <!--yandex map api end-->
 <script src="./js/main.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        M.Modal.init(document.querySelector('#auth-modal'));
+    });
+</script>
 </body>
 </html>
